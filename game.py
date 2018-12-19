@@ -678,7 +678,7 @@ class Worm:
         self.lives = 2
         self.time_spawn = 100
         self.__animation = []
-        self.speed = random.randrange(3.5, 5.5)
+        self.speed = random.randrange(3, 5)
         self.x = random.randrange(-150, 1400)
         while abs(self.x - x) < 100:
             self.x = random.randrange(-150, 1400)
@@ -909,10 +909,16 @@ skeleton_bar = [pygame.image.load('image/bar/bar19n.png'), pygame.image.load('im
                 pygame.image.load('image/bar/bar5n.png'), pygame.image.load('image/bar/bar4n.png'),
                 pygame.image.load('image/bar/bar3n.png'), pygame.image.load('image/bar/bar2n.png'),
                 pygame.image.load('image/bar/bar1n.png')]
-
+pygame.mixer.music.load('music/level.mp3')
+pygame.mixer.music.play(-1)
+flag_music = 'level'
 while not endGame:
     clock.tick(30)
     if flag == 'MENU':
+        if flag_music == 'boss':
+            pygame.mixer.music.load('music/level.mp3')
+            pygame.mixer.music.play(-1)
+            flag_music = 'level'
         skeleton = Skeleton()
         speedSpawn = 100
         bonus = Bonus(1200, 120, animations['Bonus'])
@@ -938,7 +944,7 @@ while not endGame:
             worms, bullets = bullet_logic(bullets, worms, animations, count_animation)
             bonus, dino = bonus_logic(bonus, dino)
             text_score = font.render('Score: ' + str(dino.score), True, (255, 255, 255))
-            if dino.score >= 60:
+            if dino.score >= 10:
                 dino = Dino(animations['Live'])
                 bonus = Bonus(620, 270, animations['Bonus'])
                 bullets, worms, stones = [], [], []
@@ -975,6 +981,10 @@ while not endGame:
     elif flag == 'QUESTION':
         pass
     elif flag == 'BOSS':
+        if flag_music == 'level':
+            pygame.mixer.music.load('music/boss.mp3')
+            pygame.mixer.music.play(-1)
+            flag_music = 'boss'
         if not dino.isDie:
             if count_animation == 20:
                 count_animation = 0
