@@ -1,7 +1,23 @@
 import pygame
 import random
 import time
-import math
+
+class level():
+    def __init__(self):
+        self.level = 'easy'
+
+    def level_count(self):
+        if self.level == 'easy':
+            return 25
+        else:
+            return 60
+
+    def dop_damage(self):
+        if self.level == 'easy':
+            return 5
+        else:
+            return 2
+
 
 
 def init_animations():
@@ -456,7 +472,7 @@ def bullet_logic(arr_bullets, arr_worms, arr_animations, count_animations):
     if flag == 'BOSS':
         for elem in arr_bullets:
             if abs(elem.x - skeleton.x - 40) < 25 and elem.y > skeleton.y:
-                skeleton.health -= elem.damage * 2
+                skeleton.health -= elem.damage * level.dop_damage()
                 del arr_bullets[arr_bullets.index(elem)]
 
     for worm in arr_worms:
@@ -836,7 +852,7 @@ bg = pygame.transform.scale(bg, (1280, 720))
 font = pygame.font.Font(None, 50)
 text_score = font.render('Score: 0', True, (255, 255, 255))
 win = pygame.display.set_mode((1280, 720))
-pygame.display.set_caption("Dino Adventure")
+pygame.display.set_caption("Battle in the Desert")
 animations = init_animations()
 dino = Dino(animations['Live'])
 timerSpawn = timerShoot = count_animation = flagDie = score = die_animation_count = timerHurt = timerStone = 0
@@ -844,6 +860,7 @@ bullets, worms, stones = [], [], []
 bonus = Bonus(1200, 120, animations['Bonus'])
 clock = pygame.time.Clock()
 endGame = False
+level = level()
 flag = 'MENU'
 platforms = [Platform(0, 645, animations['Platform'][0], 1280, 50),
              Platform(1040, 520, animations['Platform'][2], 230, 50),
@@ -912,6 +929,8 @@ skeleton_bar = [pygame.image.load('image/bar/bar19n.png'), pygame.image.load('im
 pygame.mixer.music.load('music/level.mp3')
 pygame.mixer.music.play(-1)
 flag_music = 'level'
+author = 'not ok'
+setting = 'not ok'
 while not endGame:
     clock.tick(30)
     if flag == 'MENU':
@@ -944,7 +963,7 @@ while not endGame:
             worms, bullets = bullet_logic(bullets, worms, animations, count_animation)
             bonus, dino = bonus_logic(bonus, dino)
             text_score = font.render('Score: ' + str(dino.score), True, (255, 255, 255))
-            if dino.score >= 10:
+            if dino.score >= level.level_count():
                 dino = Dino(animations['Live'])
                 bonus = Bonus(620, 270, animations['Bonus'])
                 bullets, worms, stones = [], [], []
@@ -977,9 +996,63 @@ while not endGame:
         timerSpawn += 1
         count_animation += 1
     elif flag == 'SETTINGS':
-        pass
+        if level.level == 'easy':
+            if setting == 'not ok':
+                win.blit(pygame.image.load('image/setting/easy.png'), (250,120))
+                pygame.display.update()
+            else:
+                win.blit(pygame.image.load('image/setting/easy_ok.png'), (250, 120))
+                pygame.display.update()
+            pos = pygame.mouse.get_pos()
+            if pos[0] > 940 and pos[0] < 1055 and pos[1] > 433 and pos[1] < 522:
+                setting = 'ok'
+            else:
+                setting = 'not ok'
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.pos[0] < 826 and event.pos[0] > 776 and event.pos[1] > 220 and event.pos[1] < 250:
+                        level.level = 'hard'
+                    elif event.pos[0] > 940 and event.pos[0] < 1055 and event.pos[1] > 433 and event.pos[1] < 522:
+                        flag = 'MENU'
+
+
+        else:
+            if level.level == 'hard':
+                if setting == 'not ok':
+                    win.blit(pygame.image.load('image/setting/hard.png'), (250, 120))
+                    pygame.display.update()
+                else:
+                    win.blit(pygame.image.load('image/setting/hard_ok.png'), (250, 120))
+                    pygame.display.update()
+                pos = pygame.mouse.get_pos()
+                if pos[0] > 940 and pos[0] < 1055 and pos[1] > 433 and pos[1] < 522:
+                    setting = 'ok'
+                else:
+                    setting = 'not ok'
+            for elem in pygame.event.get():
+                if elem.type == pygame.MOUSEBUTTONDOWN:
+                    if elem.pos[0] < 826 and elem.pos[0] > 776 and elem.pos[1] > 190 and elem.pos[1] < 217:
+                        level.level = 'easy'
+                    elif elem.pos[0] > 940 and elem.pos[0] < 1055 and elem.pos[1] > 433 and elem.pos[1] < 522:
+                        flag = 'MENU'
+
+
     elif flag == 'QUESTION':
-        pass
+        if author == 'not ok':
+            win.blit(pygame.image.load('image/author/author.png'), (350, 200))
+            pygame.display.update()
+        else:
+            win.blit(pygame.image.load('image/author/author1.png'), (350, 200))
+            pygame.display.update()
+        pos = pygame.mouse.get_pos()
+        if pos[0] > 960 and pos[0] < 990 and pos[1] > 200 and pos[1] < 235:
+            author = 'ok'
+        else:
+            author = 'not ok'
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.pos[0] > 960 and event.pos[0] < 990 and event.pos[1] > 200 and event.pos[1] < 235:
+                    flag = 'MENU'
     elif flag == 'BOSS':
         if flag_music == 'level':
             pygame.mixer.music.load('music/boss.mp3')
